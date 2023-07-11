@@ -1,9 +1,28 @@
-import { ConnectWallet, useAddress, Web3Button } from "@thirdweb-dev/react";
+import { ConnectWallet, useAddress, useUser, useContract, useOwnedNFTs } from "@thirdweb-dev/react";
 import Link from "next/link";
 import styles from "../styles/Home.module.css";
-
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { contractAddress, minimumBalance } from "../const/yourDetails"
 export default function Login() {
   const address = useAddress(); // Get the user's address
+  const { user, isLoggedIn } = useUser();
+  console.log({user, isLoggedIn});
+
+  const router = useRouter();
+  const {
+    contract,
+    isLoading: loadingContract,
+    error: errorLoadingContract,
+  } = useContract(contractAddress);
+  const { data: nfts, isLoading } = useOwnedNFTs(contract, address);
+
+  useEffect(() => {
+    if (!user || !user.address) return;
+    if (!nfts || nfts.length <= minimumBalance) 
+      return console.log('User logged in but NFT not found');
+    router.push('/the-page-of-your-choice');
+  }, [user, nfts]);
 
   return (
     <div className={styles.container}>
