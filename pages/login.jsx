@@ -1,4 +1,4 @@
-import { ConnectWallet, useAddress, useUser, useContract, useOwnedNFTs } from "@thirdweb-dev/react";
+import { ConnectWallet, useAddress, useUser, useContract, useOwnedNFTs, useLogin } from "@thirdweb-dev/react";
 import Link from "next/link";
 import styles from "../styles/Home.module.css";
 import { useEffect } from "react";
@@ -8,7 +8,7 @@ export default function Login() {
   const address = useAddress(); // Get the user's address
   const { user, isLoggedIn } = useUser();
   console.log({user, isLoggedIn});
-
+  const { isLoading:logginIn, login } = useLogin();
   const router = useRouter();
   const {
     contract,
@@ -16,6 +16,11 @@ export default function Login() {
     error: errorLoadingContract,
   } = useContract(contractAddress);
   const { data: nfts, isLoading } = useOwnedNFTs(contract, address);
+
+  useEffect(() => {
+    if (!address) return;
+    login();
+  }, [address]);
 
   useEffect(() => {
     if (!user || !user.address) return;
